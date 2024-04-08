@@ -1,0 +1,683 @@
+{% load static %}
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Data Table | Notika - Notika Admin Template</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- font awesome CSS -->
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <!-- owl.carousel CSS -->
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.transitions.css' %}">
+    <!-- meanmenu CSS -->
+    <link rel="stylesheet" href="{% static 'css/meanmenu/meanmenu.min.css' %}">
+    <!-- animate CSS -->
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+    <!-- normalize CSS -->
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+    <!-- wave CSS -->
+    <link rel="stylesheet" href="{% static 'css/wave/waves.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/wave/button.css' %}">
+    <!-- mCustomScrollbar CSS -->
+    <link rel="stylesheet" href="{% static 'css/scrollbar/jquery.mCustomScrollbar.min.css' %}">
+    <!-- Notika icon CSS -->
+    <link rel="stylesheet" href="{% static 'css/notika-custom-icon.css' %}">
+    <!-- Data Table JS -->
+    <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+    <!-- main CSS -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <!-- style CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- responsive CSS -->
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <!-- modernizr JS -->
+    <script src="{% static 'js/vendor/modernizr-2.8.3.min.js' %}"></script>
+    <style>
+        /* This css is for normalizing styles. You can skip this. */
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+
+
+        .new {
+            padding: 50px;
+        }
+
+        .form-group {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            padding: 0;
+            height: initial;
+            width: initial;
+            margin-bottom: 0;
+            display: none;
+            cursor: pointer;
+        }
+
+        .form-group label {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .form-group label:before {
+            content: '';
+            -webkit-appearance: none;
+            background-color: transparent;
+            border: 2px solid #0079bf;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
+            padding: 5px;
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .form-group input:checked+label:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 25%;
+            left: 5px;
+            width: 6px;
+            height: 8px;
+            border: solid #0079bf;
+            border-width: 0 2px 2px 0;
+            transform: translate(-50%, -50%);
+            /* Centers the tick */
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+
+
+<body>
+    <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <!-- Start Header Top Area -->
+    <div class="header-top-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                    <div class="logo-area">
+                        <h4 style="color: white; font-size: 1.5em;">Child Rescue System</h4>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                    <div class="header-top-menu">
+                        <ul class="nav navbar-nav notika-top-nav">
+                            <li class="nav-item dropdown">
+                                <a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
+                                    class="nav-link dropdown-toggle"><span><i
+                                            class="glyphicon glyphicon-search"></i></span></a>
+                                <div role="menu" class="dropdown-menu search-dd animated flipInX"
+                                    style="top: auto;width: auto;">
+                                    <div class="search-input">
+                                        <i class="notika-icon notika-left-arrow"></i>
+                                        <input type="text" id="searchInput" placeholder="Search..." />
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item nc-al"><a href="#" data-toggle="dropdown" role="button"
+                                    aria-expanded="false" class="nav-link dropdown-toggle"><span><i
+                                            class="glyphicon glyphicon-bell"></i></span></a>
+                                <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
+                                    <div class="hd-mg-tt">
+                                        <h2>Notification</h2>
+                                    </div>
+                                    <div class="hd-message-info">
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>David Belle</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Jonathan Morris</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/4.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Fredric Mitchell</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>David Belle</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Glenn Jecobs</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="hd-mg-va">
+                                        <a href="#">View All</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item nc-al"><a href="#" data-toggle="dropdown" role="button"
+                                    aria-expanded="false" class="nav-link dropdown-toggle"><span><i
+                                            class="glyphicon glyphicon-share"></i></span>
+                                    <div class="spinner4 spinner-4"></div>
+                                    <div class="ntd-ctn"><span>3</span></div>
+                                </a>
+                                <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
+                                    <div class="hd-mg-tt">
+                                        <h2>Notification</h2>
+                                    </div>
+                                    <div class="hd-message-info">
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>David Belle</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Jonathan Morris</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/4.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Fredric Mitchell</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>David Belle</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <a href="#">
+                                            <div class="hd-message-sn">
+                                                <div class="hd-message-img">
+                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
+                                                </div>
+                                                <div class="hd-mg-ctn">
+                                                    <h3>Glenn Jecobs</h3>
+                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="hd-mg-va">
+                                        <a href="#">View All</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="/dashboard" role="button"><span style="font-weight: 100;"
+                                        class="glyphicon glyphicon-arrow-left"></span></a>
+                                <div role="menu" class="dropdown-menu message-dd animated zoomIn">
+                                    <div class="hd-mg-tt">
+                                        <h2>Messages</h2>
+                                    </div>
+                                    <div class="hd-message-info">
+
+                                    </div>
+                                    <div class="hd-mg-va">
+                                        <a href="#"></a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="/logout" role="button"><span style="font-weight: 100;"
+                                        class="glyphicon glyphicon-log-out"></span></a>
+                                <div role="menu" class="dropdown-menu message-dd animated zoomIn">
+                                    <div class="hd-mg-tt">
+                                        <h2>Messages</h2>
+                                    </div>
+                                    <div class="hd-message-info">
+
+                                    </div>
+                                    <div class="hd-mg-va">
+                                        <a href="#"></a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Header Top Area -->
+    <div class="alert_msg" id="alert_msg">
+    
+    </div>
+    <!-- Mobile Menu start -->
+    <div class="mobile-menu-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile Menu end -->
+    <!-- Main Menu area start-->
+    <div class="main-menu-area mg-tb-40">
+        <div class="container">
+            <div class="row">
+
+            </div>
+        </div>
+    </div>
+    <!-- Main Menu area End-->
+    <!-- Breadcomb area Start-->
+    <div class="sale-statistic-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9 col-md-8 col-sm-7 col-xs-12">
+                    <div class="sale-statistic-inner notika-shadow mg-tb-30">
+                        <div class="curved-inner-pro">
+                            <div class="curved-ctn">
+                                <h2 id="heading1">Live Streaming</h2>
+                                <p>By using Esp32</p>
+                            </div>
+                        </div>
+                        <div>
+                            <video width="100%" height="310px" controls>
+                                <source src="movie.mp4" type="video/mp4">
+                                <source src="movie.ogg" type="video/ogg">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-5 col-xs-12">
+                    <div class="statistic-right-area notika-shadow mg-tb-30 sm-res-mg-t-0">
+                        <div class="past-day-statis">
+                            <h2>Hand Movements</h2>
+                            <p>
+                                Click the below button to control the hand movements.
+                            </p>
+                        </div>
+                        <div>
+                            <button style="margin-right: 40px;" class="btn btn-success notika-btn-success">Switch
+                                ON</button>
+                            <button class="btn btn-danger notika-btn-danger">Switch Off</button>
+                        </div>
+                        <div style="margin-top: 20px; margin-bottom: 10px;">
+                            <video width="100%" height="200px" controls>
+                                <source src="movie.mp4" type="video/mp4">
+                                <source src="movie.ogg" type="video/ogg">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="breadcomb-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                    <div class="breadcomb-list">
+                        <div class="row">
+                            <div class="curved-ctn" style="margin-left: 40px;">
+                                <h2 id="heading2">Live Location</h2>
+                                <p>By using Gsm</p>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                                <div class="google-map-single">
+                                    <div id="map2"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="tpgp-helper mg-t-30">
+                                    <div class="tpgp-hp-hd typography-mgn">
+                                        <h2 id="heading3" class="mn-hd-s">Address</h2>
+                                    </div>
+                                    <div class="tpgp-al-cl">
+                                        <h3>Dindugal District </h3>
+                                        <p>3/4,123 Mainroad,<br>Old batlagundu,<br>Nilakottai
+                                            Taluk,<br><strong>Pincode:</strong>624202</p>
+                                        <div class="abvi-act">
+                                            <h2 id="heading4">Nearby stations</h2>
+                                            <p>batlagundu,Nilakottai,Dindugal.</p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcomb area End-->
+    <!-- Bar Chart area End-->
+    <div class="flot-chart-area">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="email-statis-inner notika-shadow">
+                        <div class="email-ctn-round">
+                            <div class="email-rdn-hd">
+                                <h2 id="heading5">Statistics</h2>
+                            </div>
+                            <div class="email-statis-wrap">
+                                <div class="email-round-nock">
+                                    <input type="text" class="knob" value="0" data-rel="55" data-linecap="round"
+                                        data-width="130" data-bgcolor="#E4E4E4" data-fgcolor="#00c292"
+                                        data-thickness=".10" data-readonly="true">
+                                </div>
+                                <div class="email-ctn-nock">
+                                    <p>Total Three Parameters</p>
+                                </div>
+                            </div>
+                            <div class="email-round-gp">
+                                <div class="email-round-pro">
+                                    <div class="email-signle-gp">
+                                        <input type="text" class="knob" value="0" data-rel="75" data-linecap="round"
+                                            data-width="90" data-bgcolor="#E4E4E4" data-fgcolor="#00c292"
+                                            data-thickness=".10" data-readonly="true" disabled>
+                                    </div>
+                                    <div class="email-ctn-nock">
+                                        <p>Temperature</p>
+                                    </div>
+                                </div>
+                                <div class="email-round-pro">
+                                    <div class="email-signle-gp">
+                                        <input type="text" class="knob" value="0" data-rel="35" data-linecap="round"
+                                            data-width="90" data-bgcolor="#E4E4E4" data-fgcolor="#00c292"
+                                            data-thickness=".10" data-readonly="true" disabled>
+                                    </div>
+                                    <div class="email-ctn-nock">
+                                        <p>Humiditiy</p>
+                                    </div>
+                                </div>
+                                <div class="email-round-pro sm-res-ds-n lg-res-mg-bl">
+                                    <div class="email-signle-gp">
+                                        <input type="text" class="knob" value="0" data-rel="45" data-linecap="round"
+                                            data-width="90" data-bgcolor="#E4E4E4" data-fgcolor="#00c292"
+                                            data-thickness=".10" data-readonly="true" disabled>
+                                    </div>
+                                    <div class="email-ctn-nock">
+                                        <p>Oxygen</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+
+                    <div class="flot-chart-wp mg-t-30">
+                        <div class="email-rdn-hd">
+                            <h2 style="font-size: 20px;" id="heading6">Pulse</h2>
+                        </div>
+                        <div id="dynamic-chart" class="flot-chart flot-chr-pro"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bar Chart area End-->
+    <!-- Data Table area Start-->
+    <div class="data-table-area" style="margin-top: 40px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="data-table-list">
+
+                        <div class="table-responsive">
+
+                           <h2 style="font-size: 20px;" id="heading7">Data Table</h2>
+                            <table id="data-table-basic" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th>Device ID</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Temperature</th>
+                                        <th>Humidity</th>
+                                        <th>Child State</th>
+                                        <th>Oxygen Level</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if selected_device %}
+                                    {% for element in elements %}
+                                    <tr>
+                                        <td>{{ selected_device.Device_name }}</td>
+                                        <td>{{ selected_device.Device_id }}</td>
+                                        <td>{{ element.date }}</td>
+                                        <td>{{ element.time }}</td>
+                                        <td>{{ element.temperature }}</td>
+                                        <td>{{ element.humidity }}</td>
+                                        <td>{{ element.child_state }}</td>
+                                        <td>{{ element.oxygen_level }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th>Device ID</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Temperature</th>
+                                        <th>Humidity</th>
+                                        <th>Child State</th>
+                                        <th>Oxygen Level</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="breadcomb-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="breadcomb-list">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="breadcomb-wp">
+                                    <div class="breadcomb-icon">
+                                        <i class="notika-icon notika-down-arrow"></i>
+                                    </div>
+                                    <div class="breadcomb-ctn">
+                                        <h2 id="heading8">Download</h2>
+                                        <p>You can download both CSV/PDF</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+
+                                <div class="new">
+                                    <form id="downloadForm" method="post">
+                                       
+                                        <div class="form-group">
+                                            <input type="checkbox" id="csv" name="fileType" value="CSV">
+                                            <label for="csv">CSV</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="checkbox" id="pdf" name="fileType" value="PDF">
+                                            <label for="pdf">PDF</label>
+                                        </div>
+                                        <div class="breadcomb-ctn" style="text-align: right;">
+                                            <button id="downloadButton" onclick="download('{{ selected_device.Device_id }}', '{{ selected_device.Device_name }}','{{ selected_device.id }}')" style="background: #00c292;color: #fff; border-radius: 3px;" data-toggle="tooltip" data-placement="left" title="Download Report" class="btn"><i class="notika-icon notika-sent"></i> Download</button>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- Data Table area End-->
+    <!-- Start Footer area-->
+    <div class="footer-copyright-area">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="footer-copy-right">
+                        <p>Copyright © 2018
+                            . All rights reserved. Template by <a href="https://colorlib.com">Colorlib</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Footer area-->
+    <!-- jquery
+		============================================ -->
+    <script src="{% static 'js/vendor/jquery-1.12.4.min.js' %}"></script>
+    <!-- bootstrap JS -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- wow JS -->
+    <script src="{% static 'js/wow.min.js' %}"></script>
+    <!-- price-slider JS -->
+    <script src="{% static 'js/jquery-price-slider.js' %}"></script>
+    <!-- owl.carousel JS -->
+    <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+    <!-- scrollUp JS -->
+    <script src="{% static 'js/jquery.scrollUp.min.js' %}"></script>
+    <!-- meanmenu JS -->
+    <script src="{% static 'js/meanmenu/jquery.meanmenu.js' %}"></script>
+    <!-- counterup JS -->
+    <script src="{% static 'js/counterup/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'js/counterup/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/counterup/counterup-active.js' %}"></script>
+    <!-- mCustomScrollbar JS -->
+    <script src="{% static 'js/scrollbar/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+    <!-- sparkline JS -->
+    <script src="{% static 'js/sparkline/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static 'js/sparkline/sparkline-active.js' %}"></script>
+    <!-- flot JS -->
+    <script src="{% static 'js/flot/jquery.flot.js' %}"></script>
+    <script src="{% static 'js/flot/jquery.flot.resize.js' %}"></script>
+    <script src="{% static 'js/flot/flot-active.js' %}"></script>
+    <!-- knob JS -->
+    <script src="{% static 'js/knob/jquery.knob.js' %}"></script>
+    <script src="{% static 'js/knob/jquery.appear.js' %}"></script>
+    <script src="{% static 'js/knob/knob-active.js' %}"></script>
+    <!-- Chat JS -->
+    <script src="{% static 'js/chat/jquery.chat.js' %}"></script>
+    <!-- todo JS -->
+    <script src="{% static 'js/todo/jquery.todo.js' %}"></script>
+    <!-- wave JS -->
+    <script src="{% static 'js/wave/waves.min.js' %}"></script>
+    <script src="{% static 'js/wave/wave-active.js' %}"></script>
+    <!-- plugins JS -->
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <!-- Data Table JS -->
+    <script src="{% static 'js/data-table/jquery.dataTables.min.js' %}"></script>
+    <!-- Google map JS -->
+    <script src="{% static 'js/google.maps/google.maps2-active.js' %}"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
+    <!-- icheck JS -->
+    <script src="{% static 'js/icheck/icheck.min.js' %}"></script>
+    <script src="{% static 'js/icheck/icheck-active.js' %}"></script>
+    <script src="{% static 'js/data-table/data-table-act.js' %}"></script>
+    <!-- main JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/datatable.js' %}"></script>
+    <!-- tawk chat JS
+		============================================ -->
+</body>
+
+</html>
