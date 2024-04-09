@@ -31,7 +31,16 @@ class Element(models.Model):
         return f"Element for {self.device.Device_name} on {self.date} at {self.time}"
 
 
-
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.CharField(max_length=255)
+    date = models.DateField()
+    time = models.TimeField()
+    read = models.BooleanField(default=False)
+    deviceId_or_global= models.CharField(max_length=50) 
+    
+    class Meta:
+        ordering = ['-date', '-time']
 
 
 

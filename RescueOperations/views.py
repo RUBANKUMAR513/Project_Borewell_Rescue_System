@@ -13,6 +13,7 @@ from django.core import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import DeviceDetails
+from .models import Notification
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
@@ -20,8 +21,10 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-
- 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import DeviceDetails, Element
+from django.shortcuts import get_object_or_404 
 
 def index(request):
     return render(request,'Login.html')
@@ -31,37 +34,42 @@ def index(request):
 def Dashboard(request):
     if request.session.get('user_type') == 'regular':
         user_id = request.session.get('user_id')
+        
         devices = DeviceDetails.objects.filter(user_id=user_id)
         username = request.session.get('username').capitalize()
-        context = {'username': username, 'devices': devices}
+        global_notifications = Notification.objects.filter(user_id=user_id, deviceId_or_global='global')
+        unread_notifications_count = global_notifications.filter(read=False).count()
+        context = {'username': username, 'devices': devices, 'global_notifications': global_notifications,'unread_notifications_count': unread_notifications_count}
         return render(request, 'index-3.html', context)
     else:
         return redirect('/login')
- 
     
 
-from .models import DeviceDetails, Element
-
-from django.shortcuts import get_object_or_404
 
 @login_required
 def deviceDashboard(request):
     if request.user.is_authenticated:
         devices = DeviceDetails.objects.filter(user=request.user)
         selected_device_id = request.GET.get('device_id')
+        print('device_id',selected_device_id)
         selected_device = None
         elements = None
+        notifications = None
 
         if selected_device_id:
             selected_device = get_object_or_404(DeviceDetails, id=selected_device_id, user=request.user)
+            print(selected_device)
             elements = Element.objects.filter(device=selected_device)
-
+            notifications = Notification.objects.filter(user=request.user,deviceId_or_global=selected_device_id)
+            unread_notifications_count = notifications.filter(read=False).count()
         context = {
             'user_id': request.user.id,
             'username': request.user.username.capitalize(),
             'devices': devices,
             'elements': elements,
             'selected_device': selected_device,
+            'global_notifications': notifications,
+            'unread_notifications_count': unread_notifications_count,
         }
         
         return render(request, 'data-table.html', context)
@@ -157,7 +165,7 @@ def generate_pdf(request):
     table = Table(table_data)
     style = TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        # Add more styles if needed
+        
     ])
     table.setStyle(style)
     content.append(table)
@@ -195,5 +203,12 @@ def generate_csv(request):
             element.oxygen_level,
             element.pulse,
         ])
-
+    
     return response
+
+@receiver(post_save, sender=Notification)
+def delete_old_notifications(sender, instance, **kwargs):
+    user_notifications = Notification.objects.filter(user=instance.user)
+    if user_notifications.count() > 100:
+        notifications_to_delete = user_notifications.order_by('date', 'time')[:user_notifications.count() - 100]
+        notifications_to_delete.delete()

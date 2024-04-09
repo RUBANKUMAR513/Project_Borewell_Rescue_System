@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Data Table | Notika - Notika Admin Template</title>
+    <title>Device Dashboard | Child Rescue system</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- favicon -->
@@ -150,139 +150,67 @@
                                         <h2>Notification</h2>
                                     </div>
                                     <div class="hd-message-info">
+                                        {% for notification in global_notifications %}
                                         <a href="#">
                                             <div class="hd-message-sn">
                                                 <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                    <img src="{% static 'img/post/5.jpg' %}" alt="" />
                                                 </div>
                                                 <div class="hd-mg-ctn">
-                                                    <h3>David Belle</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                    <h3>{{ notification.deviceId_or_global }}</h3>
+                                                    <p>{{ notification.message }}</p>
                                                 </div>
                                             </div>
                                         </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Jonathan Morris</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/4.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Fredric Mitchell</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>David Belle</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Glenn Jecobs</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
+                                        {% endfor %}
+
                                     </div>
                                     <div class="hd-mg-va">
                                         <a href="#">View All</a>
                                     </div>
                                 </div>
                             </li>
-                            <li class="nav-item nc-al"><a href="#" data-toggle="dropdown" role="button"
-                                    aria-expanded="false" class="nav-link dropdown-toggle"><span><i
-                                            class="glyphicon glyphicon-share"></i></span>
-                                    <div class="spinner4 spinner-4"></div>
-                                    <div class="ntd-ctn"><span>3</span></div>
-                                </a>
+                            <li class="nav-item nc-al">
+                                {% if unread_notifications_count > 0 %}
+                                <div class="spinner4 spinner-4"></div>
+                                <div class="ntd-ctn"><span style="color: white;">{{unread_notifications_count}}</span>
+                                </div>
+                                {% endif %}
+
                                 <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
                                     <div class="hd-mg-tt">
                                         <h2>Notification</h2>
                                     </div>
                                     <div class="hd-message-info">
+                                        {% for notification in global_notifications %}
                                         <a href="#">
                                             <div class="hd-message-sn">
                                                 <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                    <img src="{% static 'img/post/5.jpg' %}" alt="" />
                                                 </div>
                                                 <div class="hd-mg-ctn">
-                                                    <h3>David Belle</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                    <h3>{{ notification.deviceId_or_global }}</h3>
+                                                    <p>{{ notification.message }}</p>
                                                 </div>
                                             </div>
                                         </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Jonathan Morris</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/4.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Fredric Mitchell</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>David Belle</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Glenn Jecobs</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
+                                        {% endfor %}
+
                                     </div>
                                     <div class="hd-mg-va">
                                         <a href="#">View All</a>
                                     </div>
                                 </div>
                             </li>
+
+                            <li class="nav-item nc-al"><a href="#" data-toggle="dropdown" role="button"
+                                    aria-expanded="false" class="nav-link dropdown-toggle"><span><i
+                                            class="glyphicon glyphicon-share"></i></span>
+
+                                </a>
+
+                            </li>
+
                             <li class="nav-item dropdown">
                                 <a href="/dashboard" role="button"><span style="font-weight: 100;"
                                         class="glyphicon glyphicon-arrow-left"></span></a>
@@ -321,7 +249,7 @@
     </div>
     <!-- End Header Top Area -->
     <div class="alert_msg" id="alert_msg">
-    
+
     </div>
     <!-- Mobile Menu start -->
     <div class="mobile-menu-area">
@@ -511,7 +439,7 @@
 
                         <div class="table-responsive">
 
-                           <h2 style="font-size: 20px;" id="heading7">Data Table</h2>
+                            <h2 style="font-size: 20px;" id="heading7">Data Table</h2>
                             <table id="data-table-basic" class="table table-striped">
                                 <thead>
                                     <tr>
@@ -584,7 +512,7 @@
 
                                 <div class="new">
                                     <form id="downloadForm" method="post">
-                                       
+
                                         <div class="form-group">
                                             <input type="checkbox" id="csv" name="fileType" value="CSV">
                                             <label for="csv">CSV</label>
@@ -594,7 +522,11 @@
                                             <label for="pdf">PDF</label>
                                         </div>
                                         <div class="breadcomb-ctn" style="text-align: right;">
-                                            <button id="downloadButton" onclick="download('{{ selected_device.Device_id }}', '{{ selected_device.Device_name }}','{{ selected_device.id }}')" style="background: #00c292;color: #fff; border-radius: 3px;" data-toggle="tooltip" data-placement="left" title="Download Report" class="btn"><i class="notika-icon notika-sent"></i> Download</button>
+                                            <button id="downloadButton"
+                                                onclick="download('{{ selected_device.Device_id }}', '{{ selected_device.Device_name }}','{{ selected_device.id }}')"
+                                                style="background: #00c292;color: #fff; border-radius: 3px;"
+                                                data-toggle="tooltip" data-placement="left" title="Download Report"
+                                                class="btn"><i class="notika-icon notika-sent"></i> Download</button>
 
                                         </div>
                                     </form>

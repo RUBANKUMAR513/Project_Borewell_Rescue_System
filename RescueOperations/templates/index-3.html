@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Dashboard</title>
+    <title>Dashboard | Child Rescue system</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- favicon -->
@@ -70,7 +70,7 @@
                                     style="top: auto;width: auto;">
                                     <div class="search-input">
                                         <i class="notika-icon notika-left-arrow"></i>
-                                        <input id="searchInput" placeholder="Search devices..." type="text" />
+                                        <input id="searchInput" type="text" />
                                     </div>
                                 </div>
                             </li>
@@ -81,73 +81,66 @@
                                     <div class="hd-mg-tt">
                                         <h2>Notification</h2>
                                     </div>
+                                    {% for notification in global_notifications %}
                                     <div class="hd-message-info">
                                         <a href="#">
                                             <div class="hd-message-sn">
                                                 <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
+                                                    <img src="{% static 'img/post/5.jpg' %}" alt="" />
                                                 </div>
                                                 <div class="hd-mg-ctn">
-                                                    <h3>David Belle</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                    <h3>Dashboard</h3>
+                                                    <p>{{ notification.message }}</p>
                                                 </div>
                                             </div>
                                         </a>
+
+                                    </div>
+                                    {% endfor %}
+                                    <div class="hd-mg-va">
+                                        <a href="#">View All</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item nc-al">
+                                {% if unread_notifications_count > 0 %}
+                                <div class="spinner4 spinner-4"></div>
+                                <div class="ntd-ctn"><span style="color: white;">{{unread_notifications_count}}</span>
+                                </div>
+                                {% endif %}
+
+                                <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
+                                    <div class="hd-mg-tt">
+                                        <h2>Notification</h2>
+                                    </div>
+                                    <div class="hd-message-info">
+                                        {% for notification in global_notifications %}
                                         <a href="#">
                                             <div class="hd-message-sn">
                                                 <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
+                                                    <img src="{% static 'img/post/5.jpg' %}" alt="" />
                                                 </div>
                                                 <div class="hd-mg-ctn">
-                                                    <h3>Jonathan Morris</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
+                                                    <h3>{{ notification.deviceId_or_global }}</h3>
+                                                    <p>{{ notification.message }}</p>
                                                 </div>
                                             </div>
                                         </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/4.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Fredric Mitchell</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/1.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>David Belle</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="hd-message-sn">
-                                                <div class="hd-message-img">
-                                                    <img src="{% static 'img/post/2.jpg' %}" alt="" />
-                                                </div>
-                                                <div class="hd-mg-ctn">
-                                                    <h3>Glenn Jecobs</h3>
-                                                    <p>Cum sociis natoque penatibus et magnis dis parturient montes</p>
-                                                </div>
-                                            </div>
-                                        </a>
+                                        {% endfor %}
+
                                     </div>
                                     <div class="hd-mg-va">
                                         <a href="#">View All</a>
                                     </div>
                                 </div>
                             </li>
+
+
+
                             <li class="nav-item dropdown">
                                 <a href="/logout" role="button"><span style="font-weight: 100;"
                                         class="glyphicon glyphicon-log-out"></span>
-                                    <div class="spinner4 spinner-4"></div>
-                                    <div class="ntd-ctn"><span>3</span></div>
+
                                 </a>
 
                             </li>
@@ -165,15 +158,25 @@
     <div style="background-color:  #F6F8FA;" class="mobile-menu-area">
         <div class="container">
             <div class="row" style="margin-bottom: 100px;">
+                {% if devices %}
                 {% for device in devices %}
-                <div style="margin-top: 10px;" class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                    <div
-                        class="invoice-hs {% if device.state == 'off' %}gdt-inv{% else %}wt-inv{% endif %} sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
-                        <span>{{ device.Device_name }}</span>
-                        <h2>{{ device.Device_id }}</h2>
-                    </div>
+                <div style="margin-top: 10px;" class="device-container col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <a href="/deviceDashboard?device_id={{ device.id }}">
+                        <div
+                            class="invoice-hs {% if device.state == 'off' %}gdt-inv{% else %}wt-inv{% endif %} sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
+                            <span><strong>Device Name: </strong>{{ device.Device_name }}</span>
+                            <h2><strong>Device Id: </strong>{{ device.Device_id }}</h2>
+                        </div>
+                    </a>
                 </div>
                 {% endfor %}
+                {% else %}
+                <div class="col-lg-12">
+                    <div class="alert alert-info" role="alert" style="text-align: center;width: 100%;">
+                        Device not found.
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
         </div>
@@ -184,26 +187,27 @@
         <div class="container">
             <div class="row" style="margin-bottom: 100px;">
                 {% if devices %}
-                    {% for device in devices %}
-                        <div style="margin-top: 10px;" class="device-container col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                            <a href="/deviceDashboard?device_id={{ device.id }}">
-                                <div class="invoice-hs {% if device.state == 'off' %}gdt-inv{% else %}wt-inv{% endif %} sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
-                                    <span><strong>Device Name: </strong>{{ device.Device_name }}</span>
-                                    <h2><strong>Device Id: </strong>{{ device.Device_id }}</h2>
-                                </div>
-                            </a>
+                {% for device in devices %}
+                <div style="margin-top: 10px;" class="device-container col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                    <a href="/deviceDashboard?device_id={{ device.id }}">
+                        <div
+                            class="invoice-hs {% if device.state == 'off' %}gdt-inv{% else %}wt-inv{% endif %} sm-res-mg-t-30 tb-res-mg-t-30 tb-res-mg-t-0">
+                            <span><strong>Device Name: </strong>{{ device.Device_name }}</span>
+                            <h2><strong>Device Id: </strong>{{ device.Device_id }}</h2>
                         </div>
-                    {% endfor %}
+                    </a>
+                </div>
+                {% endfor %}
                 {% else %}
-                    <div class="col-lg-12">
-                        <div class="alert alert-info" role="alert" style="text-align: center;width: 100%;">
-                            Device not found.
-                        </div>
+                <div class="col-lg-12">
+                    <div class="alert alert-info" role="alert" style="text-align: center;width: 100%;">
+                        Device not found.
                     </div>
+                </div>
                 {% endif %}
             </div>
-            
-            
+
+
         </div>
     </div>
     <!-- Main Menu area End-->
