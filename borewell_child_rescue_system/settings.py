@@ -27,7 +27,7 @@ DEBUG = True
 
 # In settings.py
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '192.168.1.8','febinosolutions.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '192.168.1.12','febinosolutions.com']
 
 
 

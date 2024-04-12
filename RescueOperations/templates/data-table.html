@@ -145,12 +145,12 @@
                             <li class="nav-item nc-al"><a href="#" data-toggle="dropdown" role="button"
                                     aria-expanded="false" class="nav-link dropdown-toggle"><span><i
                                             class="glyphicon glyphicon-bell"></i>
-                                            
-                                        
-                                        </span></a>
-                                        
+
+
+                                    </span></a>
+
                                 <div role="menu" class="dropdown-menu message-dd notification-dd animated zoomIn">
-                                  
+
                                     <div class="hd-mg-tt">
                                         <h2>Notification</h2>
                                     </div>
@@ -176,19 +176,20 @@
                                 </div>
                             </li>
                             <li class="nav-item nc-al"><a href="#" data-toggle="dropdown" role="button"
-                                aria-expanded="false" class="nav-link dropdown-toggle"><span><i
-                                        class="glyphicon glyphicon-share"></i></span>
-                                        {% if unread_notifications_count > 0 %}
-                                            <div class="spinner4 spinner-4"></div>
-                                            <div class="ntd-ctn"><span style="color: white;">{{unread_notifications_count}}</span>
-                                            </div>
-                                            {% endif %}
-                            </a>
+                                    aria-expanded="false" class="nav-link dropdown-toggle"><span><i
+                                            class="glyphicon glyphicon-share"></i></span>
+                                    {% if unread_notifications_count > 0 %}
+                                    <div class="spinner4 spinner-4"></div>
+                                    <div class="ntd-ctn"><span
+                                            style="color: white;">{{unread_notifications_count}}</span>
+                                    </div>
+                                    {% endif %}
+                                </a>
 
-                        </li>
-                            
+                            </li>
 
-                            
+
+
 
                             <li class="nav-item dropdown">
                                 <a href="/dashboard" role="button"><span style="font-weight: 100;"
@@ -284,14 +285,19 @@
                                 ON</button>
                             <button class="btn btn-danger notika-btn-danger">Switch Off</button>
                         </div>
-                        <div style="margin-top: 20px; margin-bottom: 10px;">
-                            <video width="100%" height="200px" controls>
-                                <source src="movie.mp4" type="video/mp4">
-                                <source src="movie.ogg" type="video/ogg">
-                                Your browser does not support the video tag.
-                            </video>
+                        <div  style=" position: absolute;margin-top: 20px; margin-bottom: 10px;">
+                            <div style="height: 220px; overflow-y: auto;">
+                                <div style="position: -webkit-sticky; position: sticky; top: 0;">
+                                    <video width="100%" height="200px" controls>
+                                        <source src="movie.mp4" type="video/mp4">
+                                        <source src="movie.ogg" type="video/ogg">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
                         </div>
-
+                        
+                        
 
                     </div>
                 </div>
