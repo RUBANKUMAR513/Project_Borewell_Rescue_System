@@ -212,3 +212,149 @@ def delete_old_notifications(sender, instance, **kwargs):
     if user_notifications.count() > 100:
         notifications_to_delete = user_notifications.order_by('date', 'time')[:user_notifications.count() - 100]
         notifications_to_delete.delete()
+
+
+
+# Import necessary libraries
+# Import necessary libraries
+import cv2
+import numpy as np
+import mediapipe as mp
+import threading
+import serial
+import serial.tools.list_ports
+
+from django.http import StreamingHttpResponse
+from django.shortcuts import render
+
+# Serial port where the Arduino is connected; the port may change!
+port = 'COM6'
+send_data=True
+# Function to read from the serial port continuously
+def read_serial():
+    while True:
+        try:
+            if arduino and arduino.in_waiting > 0:
+                data = arduino.readline().strip()
+                print("Receiving: ", data)
+        except serial.SerialException as e:
+            print("Serial Exception:", e)
+            # Reconnect to the serial port or handle the exception appropriately
+        except PermissionError as e:
+            print("Permission Error:", e)
+            # Handle the permission error, e.g., by notifying the user or retrying after some time
+
+# Start the thread to continuously read from the serial port
+arduino = None
+connected_ports = [port.device for port in serial.tools.list_ports.comports()]
+if port in connected_ports:
+    arduino = serial.Serial(port=port, baudrate=9600, timeout=0.01)
+    serial_thread = threading.Thread(target=read_serial)
+    serial_thread.daemon = True  # Daemonize the thread so it will be terminated when the main program exits
+    serial_thread.start()
+else:
+    print(f"Error: Port {port} is not connected.")
+
+# Function to set angles and send them to Arduino
+def set_angles(angles):
+    if arduino and send_data:  # Check if the flag to send data is set
+        msg = ''
+        for angle in angles:
+            a = str(angle)
+            while len(a) < 3:
+                a = '0' + a
+            msg += a
+        msg = '<' + msg + '>'
+        print("Sending: ", msg)
+        for c in msg:
+            arduino.write(bytes(c, 'utf-8'))
+
+# Function to compute finger angles and render them onto the image
+def compute_finger_angles(image, results, joint_list):
+    angles = []
+
+    for hand in results.multi_hand_landmarks:
+        for i, joint in enumerate(joint_list):
+            a = np.array([hand.landmark[joint[0]].x, hand.landmark[joint[0]].y])
+            b = np.array([hand.landmark[joint[1]].x, hand.landmark[joint[1]].y])
+            c = np.array([hand.landmark[joint[2]].x, hand.landmark[joint[2]].y])
+
+            rad = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+            angle = np.abs(rad * 180.0 / np.pi)
+
+            if angle > 180:
+                angle = 360 - angle
+
+            if i == 0:
+                angle = np.interp(angle, [90, 180], [0, 200])
+                angle = min(180, angle)
+            else:
+                angle = np.interp(angle, [30, 180], [0, 180])
+                angle = min(180, angle)
+
+            angles.append(int(angle))
+            cv2.putText(image, str(round(angle, 2)), tuple(np.multiply(b, [640, 480]).astype(int)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (30, 30, 30), 2, cv2.LINE_AA)
+    return image, angles
+
+# Function to generate frames
+from django.http import StreamingHttpResponse
+
+def generate():
+    # Setup mediapipe
+    mp_drawing = mp.solutions.drawing_utils
+    mp_hands = mp.solutions.hands
+
+    # Define which landmarks should be considered for the fingers angles
+    joint_list = [[4, 3, 2], [7, 6, 5], [11, 10, 9], [15, 14, 13], [19, 18, 17]]
+
+    # Setup webcam feed
+    cap = cv2.VideoCapture(0)
+
+    with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5, max_num_hands=1) as hands:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            image = cv2.flip(image, 1)
+
+            # Detect hand landmarks
+            image.flags.writeable = False
+            results = hands.process(image)
+            image.flags.writeable = True
+
+            # Render detections
+            if results.multi_hand_landmarks:
+                for hand_landmarks in results.multi_hand_landmarks:
+                    mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+                # Compute angles and send them to Arduino
+                image, angles = compute_finger_angles(image, results, joint_list)
+                set_angles(angles)
+
+            # Convert image back to BGR
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            _, jpeg = cv2.imencode('.jpg', image)
+            frame = jpeg.tobytes()
+
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+# Set the response headers to indicate a multipart response
+response = StreamingHttpResponse(generate(), content_type='multipart/x-mixed-replace; boundary=frame')
+
+
+def webcam_feed(request):
+    global arduino  # Access the global arduino variable
+
+    # Check if the Arduino is connected
+    if arduino is None:
+        return HttpResponse("Error: Arduino is not connected.")
+    
+    # If Arduino is connected, proceed with streaming the webcam feed
+    return StreamingHttpResponse(generate(), content_type='multipart/x-mixed-replace; boundary=frame')
+
+
+

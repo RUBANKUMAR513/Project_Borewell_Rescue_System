@@ -281,21 +281,19 @@
                             </p>
                         </div>
                         <div>
-                            <button style="margin-right: 40px;" class="btn btn-success notika-btn-success">Switch
-                                ON</button>
-                            <button class="btn btn-danger notika-btn-danger">Switch Off</button>
+                            <button id="switchOnBtn" style="margin-right: 40px;"
+                                class="btn btn-success notika-btn-success">Switch ON</button>
+                            <button id="switchOffBtn" class="btn btn-danger notika-btn-danger">Switch Off</button>
                         </div>
                         <div style="margin-top: 20px; margin-bottom: 10px;">
                             <div style="height: 220px; overflow-y: auto;">
                                 <div style="position: relative;">
-                                    <video style=" position: sticky; top: 0;" width="100%" height="200px" controls>
-                                        <source src="movie.mp4" type="video/mp4">
-                                        <source src="movie.ogg" type="video/ogg">
-                                        Your browser does not support the video tag.
-                                    </video>
+                                    <img id="videoElement"  width="100%" height="200"></img>
+
                                 </div>
                             </div>
                         </div>
+
 
 
 
@@ -595,6 +593,40 @@
     <script src="{% static 'js/datatable.js' %}"></script>
     <!-- tawk chat JS
 		============================================ -->
+        <script>
+            const img = document.getElementById('videoElement');
+            const switchOnBtn = document.getElementById('switchOnBtn');
+            const switchOffBtn = document.getElementById('switchOffBtn');
+        
+            // Function to start updating the image source from the server
+            async function startImageUpdate() {
+                try {
+                    img.src = '/webcam_feed'; // Set the image source to the webcam feed endpoint
+                } catch (error) {
+                    console.error('Error starting video stream:', error);
+                }
+            }
+        
+            // Function to stop updating the image source
+            function stopImageUpdate() {
+                img.src = ''; // Clear the image source
+            }
+        
+            // Event listener for the switch ON button
+            switchOnBtn.addEventListener('click', function () {
+                startImageUpdate();
+            });
+        
+            // Event listener for the switch OFF button
+            switchOffBtn.addEventListener('click', function () {
+                stopImageUpdate();
+            });
+        </script>
+        
+        
+
+
+
 </body>
 
 </html>
