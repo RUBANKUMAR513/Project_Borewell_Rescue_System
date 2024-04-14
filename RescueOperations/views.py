@@ -50,6 +50,7 @@ def Dashboard(request):
 def deviceDashboard(request):
     if request.user.is_authenticated:
         devices = DeviceDetails.objects.filter(user=request.user)
+        print(devices)
         selected_device_id = request.GET.get('device_id')
         print('device_id',selected_device_id)
         selected_device = None
@@ -58,7 +59,7 @@ def deviceDashboard(request):
 
         if selected_device_id:
             selected_device = get_object_or_404(DeviceDetails, id=selected_device_id, user=request.user)
-            print(selected_device)
+            print(selected_device.state)
             elements = Element.objects.filter(device=selected_device)
             notifications = Notification.objects.filter(user=request.user,deviceId_or_global=selected_device_id)
             unread_notifications_count = notifications.filter(read=False).count()
@@ -223,10 +224,10 @@ import mediapipe as mp
 import threading
 import serial
 import serial.tools.list_ports
-
+import datetime
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
-
+import math
 # Serial port where the Arduino is connected; the port may change!
 port = 'COM6'
 send_data=True
@@ -237,12 +238,70 @@ def read_serial():
             if arduino and arduino.in_waiting > 0:
                 data = arduino.readline().strip()
                 print("Receiving: ", data)
+                
+                # Parse serial data
+                depth, gas, temperature, humidity = parse_serial_data(data)
+
+                if depth is not None and gas is not None:
+                    if temperature is None:
+                        temperature = 0
+                    if humidity is None:
+                        humidity = 0
+                    
+                    device_id = 1  # Assuming device id is 1
+
+                    # Check if the device exists
+                    try:
+                        device = DeviceDetails.objects.get(Device_id=device_id)
+                    except DeviceDetails.DoesNotExist:
+                        print(f"Device with ID {device_id} does not exist.")
+                        continue
+
+                    # Create new Element instance
+                    element = Element.objects.create(
+                        device=device,
+                        date=datetime.date.today(),
+                        time=datetime.datetime.now().time(),
+                        location="YourLocation",
+                        depth=depth,
+                        oxygen_level=gas,
+                        temperature=temperature,
+                        humidity=humidity,
+                        child_state='sad',
+                        pulse=0
+                    )
+
+                    # Save the Element instance
+                    element.save()
+                        
+
         except serial.SerialException as e:
             print("Serial Exception:", e)
             # Reconnect to the serial port or handle the exception appropriately
         except PermissionError as e:
             print("Permission Error:", e)
             # Handle the permission error, e.g., by notifying the user or retrying after some time
+
+def parse_serial_data(serial_data):
+    # Parse the received data string
+    try:
+        data_str = serial_data.decode('utf-8')  # Decode bytes to string
+        data_str = data_str.strip()[2:-1]  # Remove b'' and trailing newline
+        data_parts = data_str.split('&')  # Split by '&'
+
+        # Extract depth, gas, temperature, humidity from data_parts
+        depth_str, gas_str, temp_str, hum_str = data_parts
+        
+        depth = float(depth_str.split('=')[1])  # Extract depth value
+        gas = int(gas_str.split('=')[1])  # Extract gas value
+        temperature = float(temp_str.split('=')[1]) if 'NAN' not in temp_str else None  # Extract temperature value
+        humidity = float(hum_str.split('=')[1]) if 'NAN' not in hum_str else None  # Extract humidity value
+
+        return depth, gas, temperature, humidity
+    except Exception as e:
+        print("Error parsing serial data:", e)
+        return None, None, None, None
+
 
 # Start the thread to continuously read from the serial port
 arduino = None

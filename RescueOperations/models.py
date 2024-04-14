@@ -26,6 +26,8 @@ class Element(models.Model):
     humidity = models.DecimalField(max_digits=5, decimal_places=2)  
     oxygen_level = models.DecimalField(max_digits=5, decimal_places=2)  
     pulse = models.IntegerField()
+    depth = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    
     
     def __str__(self):
         return f"Element for {self.device.Device_name} on {self.date} at {self.time}"

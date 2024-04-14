@@ -597,7 +597,15 @@
             const img = document.getElementById('videoElement');
             const switchOnBtn = document.getElementById('switchOnBtn');
             const switchOffBtn = document.getElementById('switchOffBtn');
-        
+            
+    if ('{{ selected_device.state }}' === 'off') {
+        switchOnBtn.disabled = true;
+        switchOffBtn.disabled = true;
+    } else {
+        switchOnBtn.disabled = false;
+        switchOffBtn.disabled = false;
+    }
+
             // Function to start updating the image source from the server
             async function startImageUpdate() {
                 try {
