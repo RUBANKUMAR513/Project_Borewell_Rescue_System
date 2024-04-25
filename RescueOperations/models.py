@@ -20,6 +20,8 @@ class Element(models.Model):
 
     date = models.DateField()
     time = models.TimeField(null=True, blank=True)
+    latitude = models.CharField(max_length=20, default='0.0')  # Default latitude value
+    longitude = models.CharField(max_length=20, default='0.0')  # Default longitude value
     location = models.CharField(max_length=100)  
     child_state = models.CharField(max_length=20)
     temperature = models.DecimalField(max_digits=5, decimal_places=2)  

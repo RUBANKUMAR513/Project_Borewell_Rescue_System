@@ -24,7 +24,8 @@ from reportlab.lib.units import inch
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import DeviceDetails, Element
-from django.shortcuts import get_object_or_404 
+from django.shortcuts import get_object_or_404
+
 
 def index(request):
     return render(request,'Login.html')
@@ -61,6 +62,12 @@ def deviceDashboard(request):
             selected_device = get_object_or_404(DeviceDetails, id=selected_device_id, user=request.user)
             print(selected_device.state)
             elements = Element.objects.filter(device=selected_device)
+            last_element = Element.objects.filter(device=selected_device).order_by('-date', '-time').first()
+            if last_element:
+                last_location = last_element.location
+            else:
+                # If no last element exists, set last_location to a default value or None
+                last_location = None
             notifications = Notification.objects.filter(user=request.user,deviceId_or_global=selected_device_id)
             unread_notifications_count = notifications.filter(read=False).count()
         context = {
@@ -71,6 +78,7 @@ def deviceDashboard(request):
             'selected_device': selected_device,
             'global_notifications': notifications,
             'unread_notifications_count': unread_notifications_count,
+            'last_location':last_location,
         }
         
         return render(request, 'data-table.html', context)
@@ -183,7 +191,10 @@ from .models import Element
 def generate_csv(request):
     currentDeviceID = request.GET.get('deviceID')
     currentDeviceName = request.GET.get('deviceName')
-    id=request.GET.get('id')
+    id = request.GET.get('id')
+    
+    
+
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="childRescue.csv"'
 
@@ -191,8 +202,12 @@ def generate_csv(request):
     writer.writerow(['DeviceName', 'DeviceID', 'Date', 'Time', 'Temperature', 'Humidity', 'Child State', 'Oxygen Level', 'Pulse'])
 
     elements = Element.objects.filter(device_id=id)
+    
+   
 
     for element in elements:
+      
+
         writer.writerow([
             currentDeviceName,
             currentDeviceID,
@@ -206,6 +221,7 @@ def generate_csv(request):
         ])
     
     return response
+
 
 @receiver(post_save, sender=Notification)
 def delete_old_notifications(sender, instance, **kwargs):
@@ -228,95 +244,167 @@ import datetime
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 import math
+import requests
 # Serial port where the Arduino is connected; the port may change!
 port = 'COM6'
 send_data=True
 # Function to read from the serial port continuously
+# print("data--->",data)
+# print("accumulated_data---->",accumulated_data)
 def read_serial():
+    accumulated_data = ""  # Variable to accumulate received data
     while True:
         try:
             if arduino and arduino.in_waiting > 0:
-                data = arduino.readline().strip()
-                print("Receiving: ", data)
                 
-                # Parse serial data
-                depth, gas, temperature, humidity = parse_serial_data(data)
+                data = arduino.readline().strip().decode('utf-8')  # Read full line, decode from bytes to string
+                print("data--->",data)
+                accumulated_data += data
+                
+                print("accumulated_data---->",accumulated_data)
+                if accumulated_data.startswith('<') and accumulated_data.endswith('>'):
+                    # If a complete message is received, parse and process it
+                    device_id, depth, gas, temperature, humidity, latitude, longitude = parse_serial_data(accumulated_data)
+                   # print(device_id, depth, gas, temperature, humidity, latitude, longitude)
+                    address=get_address(latitude, longitude)
+                    print(address)
+                  
 
-                if depth is not None and gas is not None:
-                    if temperature is None:
-                        temperature = 0
-                    if humidity is None:
-                        humidity = 0
-                    
-                    device_id = 1  # Assuming device id is 1
-
-                    # Check if the device exists
                     try:
                         device = DeviceDetails.objects.get(Device_id=device_id)
                     except DeviceDetails.DoesNotExist:
                         print(f"Device with ID {device_id} does not exist.")
                         continue
 
-                    # Create new Element instance
+                    #  # Create new Element instance
                     element = Element.objects.create(
                         device=device,
                         date=datetime.date.today(),
                         time=datetime.datetime.now().time(),
-                        location="YourLocation",
+                        location=address,
                         depth=depth,
                         oxygen_level=gas,
                         temperature=temperature,
                         humidity=humidity,
                         child_state='sad',
-                        pulse=0
-                    )
+                        pulse=0,
+                        latitude=latitude,
+                        longitude=longitude,
+                     )
 
-                    # Save the Element instance
+                     # Save the Element instance
                     element.save()
-                        
+                    accumulated_data = ""  # Reset accumulated data
 
         except serial.SerialException as e:
             print("Serial Exception:", e)
-            # Reconnect to the serial port or handle the exception appropriately
         except PermissionError as e:
             print("Permission Error:", e)
-            # Handle the permission error, e.g., by notifying the user or retrying after some time
+
+
+
+
+                # Perform further processing with the parsed data
+                
+        
+                # if depth is not None and gas is not None:
+                #     if temperature is None:
+                #         temperature = 0
+                #     if humidity is None:
+                #         humidity = 0
+                    
+                #     device_id = 1  # Assuming device id is 1
+
+                #     # Check if the device exists
+                #     try:
+                #         device = DeviceDetails.objects.get(Device_id=device_id)
+                #     except DeviceDetails.DoesNotExist:
+                #         print(f"Device with ID {device_id} does not exist.")
+                #         continue
+
+                #     # Create new Element instance
+                #     element = Element.objects.create(
+                #         device=device,
+                #         date=datetime.date.today(),
+                #         time=datetime.datetime.now().time(),
+                #         location="YourLocation",
+                #         depth=depth,
+                #         oxygen_level=gas,
+                #         temperature=temperature,
+                #         humidity=humidity,
+                #         child_state='sad',
+                #         pulse=0
+                #     )
+
+                #     # Save the Element instance
+                #     element.save()
+                        
+def get_address(latitude, longitude):
+    
+    if latitude == 0.00 and longitude == 0.00:
+        return "Device not connected"
+
+    
+    url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude}&lon={longitude}"
+
+    
+    response = requests.get(url)
+
+    
+    if response.status_code == 200:
+        data = response.json()
+        address = data.get('display_name', 'Address not found')
+        return address
+    else:
+        return 'Failed to retrieve address'
+        
+           
 
 def parse_serial_data(serial_data):
-    # Parse the received data string
     try:
-        data_str = serial_data.decode('utf-8')  # Decode bytes to string
-        data_str = data_str.strip()[2:-1]  # Remove b'' and trailing newline
-        data_parts = data_str.split('&')  # Split by '&'
-
-        # Extract depth, gas, temperature, humidity from data_parts
-        depth_str, gas_str, temp_str, hum_str = data_parts
+        if not serial_data.startswith('<') or not serial_data.endswith('>'):
+            print("Invalid data format:", serial_data)
+            return None, None, None, None, None, None, None
         
-        depth = float(depth_str.split('=')[1])  # Extract depth value
-        gas = int(gas_str.split('=')[1])  # Extract gas value
-        temperature = float(temp_str.split('=')[1]) if 'NAN' not in temp_str else None  # Extract temperature value
-        humidity = float(hum_str.split('=')[1]) if 'NAN' not in hum_str else None  # Extract humidity value
+        data_str = serial_data[1:-1]  
+        data_parts = data_str.split('&')  
+        
+        values = {}
+        for part in data_parts:
+            key, value = part.split('=')
+            values[key] = value
+        print(values)
+       
+        device_id = values.get('dev', None)
+        depth = float(values.get('dep', 0.0))
+        gas = int(values.get('gas', 0))
+        temperature = float(values.get('tem', 'NAN')) if 'NAN' not in values.get('tem', 'NAN') else 0.0
+        humidity = float(values.get('hum', 'NAN')) if 'NAN' not in values.get('hum', 'NAN') else 0.0
+        latitude = float(values.get('lat', 0.0))
+        longitude = float(values.get('lon', 0.0))
 
-        return depth, gas, temperature, humidity
+        return device_id, depth, gas, temperature, humidity, latitude, longitude
     except Exception as e:
         print("Error parsing serial data:", e)
-        return None, None, None, None
+        return None, None, None, None, None, None, None
 
 
-# Start the thread to continuously read from the serial port
+
+
+
 arduino = None
 connected_ports = [port.device for port in serial.tools.list_ports.comports()]
 if port in connected_ports:
     arduino = serial.Serial(port=port, baudrate=9600, timeout=0.01)
     serial_thread = threading.Thread(target=read_serial)
-    serial_thread.daemon = True  # Daemonize the thread so it will be terminated when the main program exits
+    serial_thread.daemon = True  
     serial_thread.start()
 else:
     print(f"Error: Port {port} is not connected.")
 
-# Function to set angles and send them to Arduino
+
 def set_angles(angles):
-    if arduino and send_data:  # Check if the flag to send data is set
+    if arduino and send_data:  
         msg = ''
         for angle in angles:
             a = str(angle)
@@ -328,7 +416,6 @@ def set_angles(angles):
         for c in msg:
             arduino.write(bytes(c, 'utf-8'))
 
-# Function to compute finger angles and render them onto the image
 def compute_finger_angles(image, results, joint_list):
     angles = []
 
@@ -356,18 +443,18 @@ def compute_finger_angles(image, results, joint_list):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (30, 30, 30), 2, cv2.LINE_AA)
     return image, angles
 
-# Function to generate frames
+
 from django.http import StreamingHttpResponse
 
 def generate():
-    # Setup mediapipe
+  
     mp_drawing = mp.solutions.drawing_utils
     mp_hands = mp.solutions.hands
 
-    # Define which landmarks should be considered for the fingers angles
+ 
     joint_list = [[4, 3, 2], [7, 6, 5], [11, 10, 9], [15, 14, 13], [19, 18, 17]]
 
-    # Setup webcam feed
+   
     cap = cv2.VideoCapture(0)
 
     with mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.5, max_num_hands=1) as hands:
@@ -379,21 +466,21 @@ def generate():
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = cv2.flip(image, 1)
 
-            # Detect hand landmarks
+            
             image.flags.writeable = False
             results = hands.process(image)
             image.flags.writeable = True
 
-            # Render detections
+            
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
                     mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-                # Compute angles and send them to Arduino
+                
                 image, angles = compute_finger_angles(image, results, joint_list)
                 set_angles(angles)
 
-            # Convert image back to BGR
+         
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             _, jpeg = cv2.imencode('.jpg', image)
             frame = jpeg.tobytes()
@@ -401,19 +488,86 @@ def generate():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-# Set the response headers to indicate a multipart response
+
 response = StreamingHttpResponse(generate(), content_type='multipart/x-mixed-replace; boundary=frame')
 
 
 def webcam_feed(request):
-    global arduino  # Access the global arduino variable
+    global arduino 
 
-    # Check if the Arduino is connected
+    
     if arduino is None:
         return HttpResponse("Error: Arduino is not connected.")
-    
-    # If Arduino is connected, proceed with streaming the webcam feed
+   
     return StreamingHttpResponse(generate(), content_type='multipart/x-mixed-replace; boundary=frame')
 
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def update_url(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            url = data.get('url')
+           
+            print("Received URL:", url)
+           
+            return JsonResponse({'message': 'URL updated successfully'}, status=200)
+        except Exception as e:
+            
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+
+# FACIAL EMOTION DETECTION
+
+
+from test import facialemotion
+from django.http import StreamingHttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+# Global variable to control streaming
+streaming_enabled = True
+
+def test_emotion_view(request):
+    return render(request, 'testemotion.html')
+
+@csrf_exempt
+def toggle_view(request):
+    global streaming_enabled
+    
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        is_on = request.POST.get('is_on')
+        
+        if is_on == 'true':
+            global streaming_enabled
+            streaming_enabled = True
+            # Start streaming frames
+            print("Streaming started")
+            return JsonResponse({'message': 'Streaming started'})
+        else:
+            streaming_enabled = False
+            print("Streaming stopped")
+            return JsonResponse({'message': 'Streaming stopped'})
+    else:
+        return JsonResponse({'error': 'Invalid request'})
+
+def stream_frames_view(request):
+    print("Inside stream_frames_view")  # Add debug message
+    if streaming_enabled:
+        print("Streaming is enabled")  # Add debug message
+        return StreamingHttpResponse(facialemotion(), content_type="multipart/x-mixed-replace;boundary=frame")
+    else:
+        print("Streaming is not enabled")  # Add debug message
+        return JsonResponse({'error': 'Streaming not enabled'})
+
+
+
+
+    

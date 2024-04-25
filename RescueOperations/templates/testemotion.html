@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Emotion Recognition</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Facial Emotion Recognition</h1>
+    
+    <div id="stream">
+        <!-- Video stream will be displayed here -->
+    </div>
+    
+    <button id="toggle-btn">Start Streaming</button>
+    
+    <script>
+        $(document).ready(function() {
+    var streaming = false;
+
+    // Function to start or stop streaming
+    function toggleStreaming() {
+        var is_on = streaming ? 'false' : 'true';
+        console.log('Toggle button clicked. is_on:', is_on);
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+        console.log('CSRF token:', csrftoken);
+        $.ajax({
+            url: '/toggle/',
+            type: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken},
+            data: {'is_on': is_on},
+            success: function(response) {
+                console.log('AJAX success. Response:', response);
+                if (response.message == 'Streaming started') {
+                    $('#toggle-btn').text('Stop Streaming');
+                    streaming = true;
+                    // Start displaying the streamed frames
+                    $('#stream').html('<img style="height:100px;width:300px;" src="/stream/" />');
+                } else if (response.message == 'Streaming stopped') {
+                    $('#toggle-btn').text('Start Streaming');
+                    streaming = false;
+                    // Remove the displayed frames
+                    $('#stream').empty();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error:', error);
+            }
+        });
+    }
+    
+    // Toggle streaming when the button is clicked
+    $('#toggle-btn').click(function() {
+        toggleStreaming();
+    });
+});
+    </script>
+</body>
+</html>

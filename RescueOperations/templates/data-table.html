@@ -264,11 +264,12 @@
                             </div>
                         </div>
                         <div>
-                            <video width="100%" height="310px" controls>
-                                <source src="movie.mp4" type="video/mp4">
-                                <source src="movie.ogg" type="video/ogg">
-                                Your browser does not support the video tag.
-                            </video>
+                            <div id="stream" style="width: 100%;height: 300px;">
+                                <!-- Video stream will be displayed here -->
+                            </div>
+                            
+                            <button id="toggle-btn" style="margin-right: 40px;margin-top: 30px;"
+                            class="btn btn-success notika-btn-success">Start Streaming</button>
                         </div>
                     </div>
                 </div>
@@ -288,7 +289,7 @@
                         <div style="margin-top: 20px; margin-bottom: 10px;">
                             <div style="height: 220px; overflow-y: auto;">
                                 <div style="position: relative;">
-                                    <img id="videoElement"  width="100%" height="200"></img>
+                                    <img id="videoElement" width="100%" height="300px"></img>
 
                                 </div>
                             </div>
@@ -324,16 +325,18 @@
                                     <div class="tpgp-hp-hd typography-mgn">
                                         <h2 id="heading3" class="mn-hd-s">Address</h2>
                                     </div>
+                                    {% if last_location %}
                                     <div class="tpgp-al-cl">
-                                        <h3>Dindugal District </h3>
+                                        <!-- <h3>Dindugal District </h3>
                                         <p>3/4,123 Mainroad,<br>Old batlagundu,<br>Nilakottai
                                             Taluk,<br><strong>Pincode:</strong>624202</p>
                                         <div class="abvi-act">
                                             <h2 id="heading4">Nearby stations</h2>
                                             <p>batlagundu,Nilakottai,Dindugal.</p>
-                                        </div>
-
+                                        </div> -->
+                                        <p>{{ last_location }}</p>
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
 
@@ -495,7 +498,7 @@
 
                                 <div class="new">
                                     <form id="downloadForm" method="post">
-
+                                        {% csrf_token %}
                                         <div class="form-group">
                                             <input type="checkbox" id="csv" name="fileType" value="CSV">
                                             <label for="csv">CSV</label>
@@ -593,45 +596,84 @@
     <script src="{% static 'js/datatable.js' %}"></script>
     <!-- tawk chat JS
 		============================================ -->
-        <script>
-            const img = document.getElementById('videoElement');
-            const switchOnBtn = document.getElementById('switchOnBtn');
-            const switchOffBtn = document.getElementById('switchOffBtn');
-            
-    if ('{{ selected_device.state }}' === 'off') {
-        switchOnBtn.disabled = true;
-        switchOffBtn.disabled = true;
-    } else {
-        switchOnBtn.disabled = false;
-        switchOffBtn.disabled = false;
-    }
+    <script>
+        const img = document.getElementById('videoElement');
+        const switchOnBtn = document.getElementById('switchOnBtn');
+        const switchOffBtn = document.getElementById('switchOffBtn');
 
-            // Function to start updating the image source from the server
-            async function startImageUpdate() {
-                try {
-                    img.src = '/webcam_feed'; // Set the image source to the webcam feed endpoint
-                } catch (error) {
-                    console.error('Error starting video stream:', error);
+        if ('{{ selected_device.state }}' === 'off') {
+            switchOnBtn.disabled = true;
+            switchOffBtn.disabled = true;
+        } else {
+            switchOnBtn.disabled = false;
+            switchOffBtn.disabled = false;
+        }
+
+        // Function to start updating the image source from the server
+        async function startImageUpdate() {
+            try {
+                img.src = '/webcam_feed'; // Set the image source to the webcam feed endpoint
+            } catch (error) {
+                console.error('Error starting video stream:', error);
+            }
+        }
+
+        // Function to stop updating the image source
+        function stopImageUpdate() {
+            img.src = ''; // Clear the image source
+        }
+
+        // Event listener for the switch ON button
+        switchOnBtn.addEventListener('click', function () {
+            startImageUpdate();
+        });
+
+        // Event listener for the switch OFF button
+        switchOffBtn.addEventListener('click', function () {
+            stopImageUpdate();
+        });
+        $(document).ready(function() {
+    var streaming = false;
+
+    // Function to start or stop streaming
+    function toggleStreaming() {
+        var is_on = streaming ? 'false' : 'true';
+        console.log('Toggle button clicked. is_on:', is_on);
+        var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+        console.log('CSRF token:', csrftoken);
+        $.ajax({
+            url: '/toggle/',
+            type: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken},
+            data: {'is_on': is_on},
+            success: function(response) {
+                console.log('AJAX success. Response:', response);
+                if (response.message == 'Streaming started') {
+                    $('#toggle-btn').text('Stop Streaming');
+                    streaming = true;
+                    // Start displaying the streamed frames
+                    $('#stream').html('<img style="height:300px;width:100%;" src="/stream/" />');
+                } else if (response.message == 'Streaming stopped') {
+                    $('#toggle-btn').text('Start Streaming');
+                    streaming = false;
+                    // Remove the displayed frames
+                    $('#stream').empty();
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error:', error);
             }
-        
-            // Function to stop updating the image source
-            function stopImageUpdate() {
-                img.src = ''; // Clear the image source
-            }
-        
-            // Event listener for the switch ON button
-            switchOnBtn.addEventListener('click', function () {
-                startImageUpdate();
-            });
-        
-            // Event listener for the switch OFF button
-            switchOffBtn.addEventListener('click', function () {
-                stopImageUpdate();
-            });
-        </script>
-        
-        
+        });
+    }
+    
+    // Toggle streaming when the button is clicked
+    $('#toggle-btn').click(function() {
+        toggleStreaming();
+    });
+});
+    </script>
+
+
 
 
 
