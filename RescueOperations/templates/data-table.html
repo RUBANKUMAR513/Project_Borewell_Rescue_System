@@ -260,15 +260,15 @@
                         <div class="curved-inner-pro">
                             <div class="curved-ctn">
                                 <h2 id="heading1">Live Streaming</h2>
-                                <p>By using Esp32</p>
+                                <p>Connect Wifi With ESP32 Device And Click Start/Stop Streaming</p>
                             </div>
                         </div>
                         <div>
-                            <div id="stream" style="width: 100%;height: 300px;">
+                            <div id="stream" style="width: 100%;height: 250px;">
                                 <!-- Video stream will be displayed here -->
                             </div>
                             
-                            <button id="toggle-btn" style="margin-right: 40px;margin-top: 30px;"
+                            <button id="toggle-btn" style="margin-right: 40px;margin-top: 70px;"
                             class="btn btn-success notika-btn-success">Start Streaming</button>
                         </div>
                     </div>
@@ -279,6 +279,7 @@
                             <h2>Hand Movements</h2>
                             <p>
                                 Click the below button to control the hand movements.
+                                
                             </p>
                         </div>
                         <div>
@@ -312,12 +313,14 @@
                         <div class="row">
                             <div class="curved-ctn" style="margin-left: 40px;">
                                 <h2 id="heading2">Live Location</h2>
-                                <p>By using Gsm</p>
+                                <p>When Device is connected to System the Gps Tracker Device send current Location</p>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 
                                 <div class="google-map-single">
-                                    <div id="map2"></div>
+                                    <div id="map2">
+                                        
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -433,6 +436,9 @@
                                         <th>Device ID</th>
                                         <th>Date</th>
                                         <th>Time</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                        <th>Depth</th>
                                         <th>Temperature</th>
                                         <th>Humidity</th>
                                         <th>Child State</th>
@@ -447,6 +453,9 @@
                                         <td>{{ selected_device.Device_id }}</td>
                                         <td>{{ element.date }}</td>
                                         <td>{{ element.time }}</td>
+                                        <td>{{element.latitude}}</td>
+                                        <td>{{element.longitude}}</td>
+                                        <td>{{element.depth}}</td>
                                         <td>{{ element.temperature }}</td>
                                         <td>{{ element.humidity }}</td>
                                         <td>{{ element.child_state }}</td>
@@ -461,6 +470,9 @@
                                         <th>Device ID</th>
                                         <th>Date</th>
                                         <th>Time</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                        <th>Depth</th>
                                         <th>Temperature</th>
                                         <th>Humidity</th>
                                         <th>Child State</th>
@@ -650,11 +662,21 @@
                 console.log('AJAX success. Response:', response);
                 if (response.message == 'Streaming started') {
                     $('#toggle-btn').text('Stop Streaming');
+                    // Remove the existing class
+                    $('#toggle-btn').removeClass('btn btn-success notika-btn-success');
+
+                    // Add the new class
+                    $('#toggle-btn').addClass('btn btn-danger notika-btn-danger');
                     streaming = true;
                     // Start displaying the streamed frames
                     $('#stream').html('<img style="height:300px;width:100%;" src="/stream/" />');
                 } else if (response.message == 'Streaming stopped') {
                     $('#toggle-btn').text('Start Streaming');
+                    // Remove the existing class
+                    $('#toggle-btn').removeClass('btn btn-danger notika-btn-danger');
+
+                    // Add the new class
+                    $('#toggle-btn').addClass('btn btn-success notika-btn-success');
                     streaming = false;
                     // Remove the displayed frames
                     $('#stream').empty();

@@ -2,6 +2,12 @@ import cv2
 import numpy as np
 from keras.models import load_model
 
+
+answer="Emotion did not Find!"
+def resultData():
+    global answer
+    return answer
+
 def facialemotion():
     print("Inside facialemotion() function")
     # Load the pre-trained model
@@ -48,7 +54,8 @@ def facialemotion():
             cv2.rectangle(frame, (x, y-40), (x+w, y), (50, 50, 255), -1)
             # Put text (emotion label) on the frame
             cv2.putText(frame, labels_dict[label], (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
-
+            global answer
+            answer=labels_dict[label]
         # Convert the frame to JPEG format
         _, buffer = cv2.imencode('.jpg', frame)
         frame_bytes = buffer.tobytes()

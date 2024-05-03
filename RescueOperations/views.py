@@ -67,7 +67,7 @@ def deviceDashboard(request):
                 last_location = last_element.location
             else:
                 # If no last element exists, set last_location to a default value or None
-                last_location = None
+                last_location = "Current Location Not Found!"
             notifications = Notification.objects.filter(user=request.user,deviceId_or_global=selected_device_id)
             unread_notifications_count = notifications.filter(read=False).count()
         context = {
@@ -243,6 +243,7 @@ import serial.tools.list_ports
 import datetime
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
+from test import resultData
 import math
 import requests
 # Serial port where the Arduino is connected; the port may change!
@@ -265,10 +266,12 @@ def read_serial():
                 if accumulated_data.startswith('<') and accumulated_data.endswith('>'):
                     # If a complete message is received, parse and process it
                     device_id, depth, gas, temperature, humidity, latitude, longitude = parse_serial_data(accumulated_data)
-                   # print(device_id, depth, gas, temperature, humidity, latitude, longitude)
+                    print("parse_serial_data---->")
+                    print(device_id, depth, gas, temperature, humidity, latitude, longitude)
                     address=get_address(latitude, longitude)
                     print(address)
-                  
+                    child_state=resultData()
+                    print(child_state)
 
                     try:
                         device = DeviceDetails.objects.get(Device_id=device_id)
@@ -286,7 +289,7 @@ def read_serial():
                         oxygen_level=gas,
                         temperature=temperature,
                         humidity=humidity,
-                        child_state='sad',
+                        child_state=child_state,
                         pulse=0,
                         latitude=latitude,
                         longitude=longitude,
@@ -342,7 +345,7 @@ def read_serial():
 def get_address(latitude, longitude):
     
     if latitude == 0.00 and longitude == 0.00:
-        return "Device not connected"
+        return "Current Location Not Found!"
 
     
     url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={latitude}&lon={longitude}"
@@ -377,7 +380,7 @@ def parse_serial_data(serial_data):
        
         device_id = values.get('dev', None)
         depth = float(values.get('dep', 0.0))
-        gas = int(values.get('gas', 0))
+        gas = float(values.get('gas', 0))
         temperature = float(values.get('tem', 'NAN')) if 'NAN' not in values.get('tem', 'NAN') else 0.0
         humidity = float(values.get('hum', 'NAN')) if 'NAN' not in values.get('hum', 'NAN') else 0.0
         latitude = float(values.get('lat', 0.0))
@@ -559,12 +562,12 @@ def toggle_view(request):
         return JsonResponse({'error': 'Invalid request'})
 
 def stream_frames_view(request):
-    print("Inside stream_frames_view")  # Add debug message
+    print("Inside stream_frames_view") 
     if streaming_enabled:
-        print("Streaming is enabled")  # Add debug message
+        print("Streaming is enabled")  
         return StreamingHttpResponse(facialemotion(), content_type="multipart/x-mixed-replace;boundary=frame")
     else:
-        print("Streaming is not enabled")  # Add debug message
+        print("Streaming is not enabled")
         return JsonResponse({'error': 'Streaming not enabled'})
 
 
